@@ -199,8 +199,6 @@ function buildMap(level) {
     map[2][sc] = EMPTY;
   }
 
-  // === PLAYER SPAWN ZONE — guaranteed empty so player never starts stuck ===
-  clearZone(map, bc - 2, bc + 2, ROWS - 8, ROWS - 4);
 
   if (level === 1) {
     // Interior brick rows (with gaps = corridors)
@@ -268,6 +266,9 @@ function buildMap(level) {
     }
   }
 
+  // === ENSURE PLAYER SPAWN IS CLEAR (runs LAST after all walls built) ===
+  // Wipe a wide area around player spawn so they NEVER start overlapping walls
+  clearZone(map, bc - 5, bc + 5, ROWS - 12, ROWS - 3);
   return map;
 }
 
@@ -518,22 +519,10 @@ function drawParticles(ctx) {
 
 // ============ SPAWNING ============
 function spawnPlayer() {
-  // Place player well above the base, centered horizontally
+  // Spawn at row ROWS-8 (well above base, inside cleared zone)
   const cx = Math.floor(COLS / 2) * TILE + TILE / 2;
-  const cy = (ROWS - 6) * TILE + TILE / 2;
-  const p = new Tank(cx, cy, UP, '#4a4', PLAYER_SPEED);
-  // Verify spawn is clear; if not, try adjacent positions
-  if (p.collidesMap(0, 0) || p.collidesAnyTank(0, 0)) {
-    // Try moving left
-    for (let offset = 1; offset < 8; offset++) {
-      p.x -= TILE;
-      if (!p.collidesMap(0, 0) && !p.collidesAnyTank(0, 0)) break;
-      p.x += TILE * 2;
-      if (!p.collidesMap(0, 0) && !p.collidesAnyTank(0, 0)) break;
-      p.x -= TILE;
-    }
-  }
-  return p;
+  const cy = (ROWS - 8) * TILE + TILE / 2;
+  return new Tank(cx, cy, UP, '#4a4', PLAYER_SPEED);
 }
 
 function spawnEnemy() {
