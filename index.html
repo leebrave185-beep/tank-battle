@@ -199,6 +199,9 @@ function buildMap(level) {
     map[2][sc] = EMPTY;
   }
 
+  // === PLAYER SPAWN ZONE — guaranteed empty so player never starts stuck ===
+  clearZone(map, bc - 2, bc + 2, ROWS - 8, ROWS - 4);
+
   if (level === 1) {
     // Interior brick rows (with gaps = corridors)
     const rows = [5, 10, 15, 19];
@@ -1015,7 +1018,7 @@ function loop() {
   update();
 
   // Handle restart from any state via R key
-  if (keys['KeyR'] && state !== 'MENU' && state !== 'PLAYING') {
+  if (keys['KeyR'] && state !== 'MENU') {
     keys['KeyR'] = false;
     restart();
   }
